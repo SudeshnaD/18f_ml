@@ -5,3 +5,7 @@ class Player:
 
     def prompt(self):
         print self.game.board.positions
+
+        return Move(1,2,1)
+
+

@@ -5,9 +5,10 @@ class Game:
     def __init__(self):
         self.board = Board()
         self.moves = []
-        self.players = [Player(1), Player(-1)]
+        self.players = [Player(self, 1), Player(self, -1)]
 
-        self.next_mover().prompt()
+    def start(self):
+        self.move(self.next_mover().prompt())
 
     def next_mover(self):
         self.players[len(self.moves) % 2]
