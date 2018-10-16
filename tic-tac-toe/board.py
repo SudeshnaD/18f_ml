@@ -12,7 +12,7 @@ class Board:
     def is_valid_move(self, move):
         return self.is_occupied(move.row_coordinate, move.column_coordinate)
 
-    def is_occupied(row_coordinate, column_coordinate):
+    def is_occupied(self, row_coordinate, column_coordinate):
         return self.positions[row_coordinate][column_coordinate] == 0
 
     def is_tied(self):
@@ -24,7 +24,7 @@ class Board:
         return count == 9
 
     def rows(self):
-        self.positions
+        return self.positions
 
     def columns(self):
         first_column = []
@@ -36,7 +36,7 @@ class Board:
             second_column.append(row[1])
             third_column.append(row[2])
 
-        [first_column, second_column, third_column]
+        return [first_column, second_column, third_column]
 
     def has_winner(self):
         has_winner = False

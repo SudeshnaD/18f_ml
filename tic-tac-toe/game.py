@@ -1,49 +1,37 @@
 from board import Board
 from player import Player
 from game_round import GameRound
+from invalid_move_game_result import InvalidMoveGameResult
+from winning_game_result import WinningGameResult
+from tied_game_result import TiedGameResult
 
 class Game:
-    def __init__(self, player1, player2):
+    def __init__(self, player1_brain, player2_brain):
         self.board = Board()
         self.rounds = []
-
-        self.player1 = player1
-        self.player1.token = 1
-
-        self.player2 = player2
-        self.player2.token = -1
-
-        self.players = [player1, player2]
+        self.player1 = Player(player1_brain, 1)
+        self.player2 = Player(player2_brain, -1)
 
     def start(self):
-        self.start_new_round()
+        self.start_new_round(self.player1, self.player2)
 
-    def start_new_round(self):
-        new_round = GameRound(self.board, self.next_mover(), self.waiting_player())
+    def start_new_round(self, mover, waiting_player):
+        new_round = GameRound(mover, waiting_player)
         self.rounds.append(new_round)
-        new_round.start()
-
-    def next_mover(self):
-        self.players[len(self.rounds) % 2]
-
-    def waiting_player(self):
-        self.players[(len(self.rounds) - 1) % 2]
-
-    def current_round(self):
-        self.rounds[-1]
+        self.current_round = new_round
+        self.current_round.start(self.board)
+        self.move(self.current_round.move)
 
     def move(self, move):
-        self.current_round().move = move
-
         if not self.board.is_valid_move(move):
-            self.result = InvalidMoveGameResult(self.next_mover(), self.waiting_player())
+            self.result = InvalidMoveGameResult(self.current_round.mover)
             return
 
         self.board.update(move)
 
         if self.board.has_winner():
-            self.result = WinningGameResult(self.next_mover(), self.waiting_player())
-        else if self.board.is_tied():
-            self.result = TiedGameResult(self.next_mover(), self.waiting_player())
+            self.result = WinningGameResult(self.current_round.mover, self.current_round.waiting_player)
+        elif self.board.is_tied():
+            self.result = TiedGameResult(self.current_round.next_mover)
         else:
-            self.start_new_round()
+            self.start_new_round(self.current_round.waiting_player, self.current_round.mover)

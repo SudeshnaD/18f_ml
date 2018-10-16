@@ -1,11 +1,16 @@
+from move import Move
+
 class Player:
-    def __init__(self, token, brain):
-        self.token = token
+    def __init__(self, brain, token):
         self.brain = brain
+        self.token = token
+        self.brain.token = token
 
     def prompt(self, board):
-        print board.positions
+        (row_coordinate, column_coordinate) = self.brain.prompt(board)
 
-        return Move(1,2, self)
+        return Move(row_coordinate, column_coordinate, self.token)
 
+    def receive_result(self, result):
+        self.brain.receive_result(result)
 
