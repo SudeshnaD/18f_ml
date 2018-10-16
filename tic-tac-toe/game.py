@@ -1,31 +1,49 @@
 from board import Board
 from player import Player
+from game_round import GameRound
 
 class Game:
-    def __init__(self):
+    def __init__(self, player1, player2):
         self.board = Board()
-        self.moves = []
-        self.players = [Player(self, 1), Player(self, -1)]
+        self.rounds = []
+
+        self.player1 = player1
+        self.player1.token = 1
+
+        self.player2 = player2
+        self.player2.token = -1
+
+        self.players = [player1, player2]
 
     def start(self):
-        self.move(self.players[0].prompt(self.board))
+        self.start_new_round()
+
+    def start_new_round(self):
+        new_round = GameRound(self.board, self.next_mover(), self.waiting_player())
+        self.rounds.append(new_round)
+        new_round.start()
 
     def next_mover(self):
-        self.players[len(self.moves) % 2]
+        self.players[len(self.rounds) % 2]
+
+    def waiting_player(self):
+        self.players[(len(self.rounds) - 1) % 2]
+
+    def current_round(self):
+        self.rounds[-1]
 
     def move(self, move):
-        self.moves.append(move)
+        self.current_round().move = move
 
         if not self.board.is_valid_move(move):
-            self.result = GameResult(GameResult.INVALID_MOVE)
-            move.mover.receive_result(self.result)
+            self.result = InvalidMoveGameResult(self.next_mover(), self.waiting_player())
             return
 
         self.board.update(move)
 
-        if self.board.game_finished():
-            if self.board.is_tied():
-                self.result = GameResult(GameResult.TIED)
-            else if self.board.
+        if self.board.has_winner():
+            self.result = WinningGameResult(self.next_mover(), self.waiting_player())
+        else if self.board.is_tied():
+            self.result = TiedGameResult(self.next_mover(), self.waiting_player())
         else:
-            self.next_mover().prompt(self.board)
+            self.start_new_round()
