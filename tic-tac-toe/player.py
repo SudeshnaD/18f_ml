@@ -3,9 +3,9 @@ class Player:
         self.token = token
         self.brain = HumanBrain()
 
-    def prompt(self):
-        print self.game.board.positions
+    def prompt(self, board):
+        print board.positions
 
-        return Move(1,2,1)
+        return Move(1,2, self)
 
 
