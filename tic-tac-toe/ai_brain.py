@@ -31,15 +31,9 @@ class AIBrain:
         move_recommendations = self.model.predict(np.array([model_inputs]))[0]
         move_position = np.random.choice(np.arange(9), p=move_recommendations)
 
-        row_coordinate = move_position / 3
-        column_coordinate = move_position % 3
+        return move_position
 
-        return (row_coordinate, column_coordinate)
-
-    def receive_result(self, result):
-        pass
-
-    def learn(self, game):
+    def learn(self, board, move, result):
         pass
 
     def save(self):
