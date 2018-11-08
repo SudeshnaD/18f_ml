@@ -1,9 +1,5 @@
 class HumanBrain:
     def prompt(self, board):
-        print "You are playing: {token}".format(token=self.token)
-
-        for row in board.positions:
-            print row
         move_position = input("Which slot? (0-8) ")
         row_coordinate = move_position / 3
         column_coordinate = move_position % 3
