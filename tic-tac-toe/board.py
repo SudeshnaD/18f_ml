@@ -6,6 +6,10 @@ class Board:
                 [ 0, 0, 0],
             ]
 
+    def build(self, moves):
+        for move in moves:
+            self.update(move)
+
     def update(self, move):
         self.positions[move.row_coordinate][move.column_coordinate] = move.token
 
