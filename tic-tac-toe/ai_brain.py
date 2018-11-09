@@ -1,5 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.layers import Dropout
 import numpy as np
 
 class AIBrain:
@@ -9,12 +10,10 @@ class AIBrain:
         self.model = Sequential()
         layers = [
             Dense(units=200, activation='relu', input_dim=9),
-            Dense(units=300, activation='relu'),
-            Dense(units=500, activation='relu'),
-            Dense(units=300, activation='relu'),
-            Dense(units=200, activation='relu'),
             Dense(units=100, activation='relu'),
             Dense(units=50, activation='relu'),
+            Dense(units=25, activation='relu'),
+            Dropout(0.05)
         ]
 
         for layer in layers:
@@ -22,22 +21,25 @@ class AIBrain:
 
         OutputLayer = Dense(units=9, activation='softmax')
         self.model.add(OutputLayer)
-        self.model.load_weights(self.filename())
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        try:
+            self.model.load_weights(self.filename())
+        except IOError:
+            pass
 
-    def prompt(self, board):
+    def prompt(self, board, token):
         model_inputs = np.array(board.positions).flatten()
+        model_inputs = model_inputs * token
         move_recommendations = self.model.predict(np.array([model_inputs]))[0]
+        print move_recommendations
         move_position = np.random.choice(np.arange(9), p=move_recommendations)
 
         return move_position
 
-    def learn(self, board, move, result):
-        x = np.array(board.positions).flatten()
-        y = np.array([0] * 9)
-        y[move.flat_position()] = result
-
-        self.model.fit(np.array([x]), np.array([y]), verbose=0)
+    def learn(self, board_positions, valuations):
+        print board_positions
+        print valuations
+        self.model.fit(np.array(board_positions), np.array(valuations), verbose=0)
 
     def filename(self):
         return "{filename}.hd5".format(filename=self.model_name)
