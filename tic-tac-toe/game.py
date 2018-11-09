@@ -8,6 +8,7 @@ class Game:
         self.player1 = Player(player1_brain, 1)
         self.player2 = Player(player2_brain, -1)
         self.invalid_moves = 0
+        self.winner = False
 
     def start(self):
         self.start_new_round(self.player1, self.player2)
@@ -16,9 +17,11 @@ class Game:
         move = mover.prompt(self.board)
 
         if not self.board.is_valid_move(move):
+            # print "invalid move {position}!".format(position=move.flat_position())
             self.invalid_moves += 1
             mover.receive_invalid_move(self.board, move)
-            self.start_new_round(mover, waiter)
+            if self.invalid_moves < 20: # Prevent stack overflow
+                self.start_new_round(mover, waiter)
             return
 
         self.moves.append(move)

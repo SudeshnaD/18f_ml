@@ -33,7 +33,11 @@ class AIBrain:
         return move_position
 
     def learn(self, board, move, result):
-        pass
+        x = np.array(board.positions).flatten()
+        y = np.array([0] * 9)
+        y[move.flat_position()] = result
+
+        self.model.fit(np.array([x]), np.array([y]), verbose=0)
 
     def filename(self):
         return "{filename}.hd5".format(filename=self.model_name)
