@@ -27,7 +27,7 @@ class Game:
             print "invalid! Try again!"
             self.invalid_moves += 1
             mover.receive_invalid_move(self.board, move)
-            if self.invalid_moves < 30: # Prevent stack overflow
+            if self.invalid_moves < 20: # Prevent stack overflow
                 self.start_new_round(mover, waiter)
             return
 
