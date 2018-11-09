@@ -13,14 +13,13 @@ class AIBrain:
             Dense(units=100, activation='relu'),
             Dense(units=50, activation='relu'),
             Dense(units=25, activation='relu'),
+            Dense(units=9, activation='softmax'),
             Dropout(0.05)
         ]
 
         for layer in layers:
             self.model.add(layer)
 
-        OutputLayer = Dense(units=9, activation='softmax')
-        self.model.add(OutputLayer)
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         try:
             self.model.load_weights(self.filename())
