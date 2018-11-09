@@ -3,7 +3,7 @@ from keras.layers import Dense
 from keras.layers import Dropout
 import numpy as np
 
-class AIBrain:
+class StaticBrain:
 
     def __init__(self, model_name):
         self.model_name = model_name
@@ -21,10 +21,7 @@ class AIBrain:
             self.model.add(layer)
 
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        try:
-            self.model.load_weights(self.filename())
-        except IOError:
-            pass
+        self.load_weights()
 
     def prompt(self, board, token):
         model_inputs = np.array(board.positions).flatten()
@@ -33,14 +30,16 @@ class AIBrain:
         return self.model.predict(np.array([model_inputs]))[0]
 
     def learn(self, board_positions, valuations):
-        print board_positions
-        print valuations
-        # self.model.fit(np.array(board_positions), np.array(valuations), verbose=0)
         pass
 
     def filename(self):
         return "{filename}.hd5".format(filename=self.model_name)
 
     def save(self):
-        self.model.save_weights(self.filename())
+        pass
 
+    def load_weights(self):
+        try:
+            self.model.load_weights(self.filename())
+        except IOError:
+            pass
