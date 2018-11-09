@@ -3,7 +3,7 @@ from human_brain import HumanBrain
 from game import Game
 import csv
 
-N_RUNS = 2
+N_RUNS = 1
 
 experiment_name = "dense"
 brain = AIBrain(experiment_name)

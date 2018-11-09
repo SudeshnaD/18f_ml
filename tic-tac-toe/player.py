@@ -21,12 +21,13 @@ class Player:
         board_position = np.array(board.positions).flatten()
         board_position = board_position * self.token
 
-        valuation = [0] * 9
-        valuation[move.flat_position()] = -1000
+        other_values = 1./8.
+        valuation = [other_values] * 9
+        valuation[move.flat_position()] = 0
 
         self.brain.learn([board_position], [valuation])
 
-    def receive_result(self, moves, result):
+    def receive_result(self, moves, reward):
         board_positions = []
         board = Board()
         valuations = []
@@ -36,8 +37,9 @@ class Player:
                 board_position = board_position * self.token
                 board_positions.append(copy.copy(board_position))
 
-                valuation = [0] * 9
-                valuation[move.flat_position()] = result
+                other_values = (1. - reward) / 8.
+                valuation = [other_values] * 9
+                valuation[move.flat_position()] = reward
                 valuations.append(valuation)
             board.update(move)
 

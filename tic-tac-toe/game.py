@@ -38,13 +38,13 @@ class Game:
             print "{winner_token} wins!".format(winner_token=mover.token)
             self.winner = mover.token
             print "{winner_token} learning:".format(winner_token=mover.token)
-            mover.receive_result(self.moves, 1)
+            mover.receive_result(self.moves, 1.)
             print "{loser_token} learning:".format(loser_token=waiter.token)
-            waiter.receive_result(self.moves, -1)
+            waiter.receive_result(self.moves, 0.)
         elif self.board.is_tied():
             print "tie!"
             self.winner = 0
-            mover.receive_result(self.moves, 0)
-            waiter.receive_result(self.moves, 0)
+            # mover.receive_result(self.moves, 0.5)
+            # waiter.receive_result(self.moves, 0.5)
         else:
             self.start_new_round(waiter, mover)
