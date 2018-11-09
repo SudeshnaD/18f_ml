@@ -4,11 +4,12 @@ import numpy as np
 
 class AIBrain:
 
-    def __init__(self, model_file=None):
+    def __init__(self, model_name):
+        self.model_name = model_name
         self.model = Sequential()
-        if model_file:
-            self.model.load_weights(model_file)
-        else:
+        try:
+            self.model.load_weights(self.filename())
+        except IOError:
             layers = [
                 Dense(units=200, activation='relu', input_dim=9),
                 Dense(units=300, activation='relu'),
@@ -36,6 +37,9 @@ class AIBrain:
     def learn(self, board, move, result):
         pass
 
+    def filename(self):
+        return "{filename}.hd5".format(filename=self.model_name)
+
     def save(self):
-        self.model.save_weights("model.hd5")
+        self.model.save_weights(self.filename())
 
