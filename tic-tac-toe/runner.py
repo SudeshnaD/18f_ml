@@ -1,9 +1,11 @@
-from human_brain import HumanBrain
 from ai_brain import AIBrain
 from game import Game
 
 brain = AIBrain("dense")
-ttt = Game(brain, brain)
-ttt.start()
+
+for i in range(100):
+    print "{num}\r".format(num=i)
+    ttt = Game(brain, brain)
+    ttt.start()
 
 brain.save()
