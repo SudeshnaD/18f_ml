@@ -29,11 +29,8 @@ class AIBrain:
     def prompt(self, board, token):
         model_inputs = np.array(board.positions).flatten()
         model_inputs = model_inputs * token
-        move_recommendations = self.model.predict(np.array([model_inputs]))[0]
-        print move_recommendations
-        move_position = np.random.choice(np.arange(9), p=move_recommendations)
 
-        return move_position
+        return self.model.predict(np.array([model_inputs]))[0]
 
     def learn(self, board_positions, valuations):
         print board_positions

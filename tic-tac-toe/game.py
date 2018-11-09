@@ -21,7 +21,7 @@ class Game:
         print "{token}'s turn!".format(token=mover.token)
         move = mover.prompt(self.board)
 
-        print "{token} selects {move_position}".format(token=mover.token, move_position=move.flat_position())
+        print "{token} selects {move_position}".format(token=mover.token, move_position=move.flat_position)
 
         if not self.board.is_valid_move(move):
             print "invalid! Try again!"

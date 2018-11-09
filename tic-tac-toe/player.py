@@ -10,20 +10,19 @@ class Player:
         self.brain.token = token
 
     def prompt(self, board):
-        move_position = self.brain.prompt(board, self.token)
-
-        row_coordinate = move_position / 3
-        column_coordinate = move_position % 3
-
-        return Move(row_coordinate, column_coordinate, self)
+        move_recommendations = self.brain.prompt(board, self.token)
+        print move_recommendations
+        return Move(move_recommendations, self)
 
     def receive_invalid_move(self, board, move):
         board_position = np.array(board.positions).flatten()
         board_position = board_position * self.token
 
-        other_values = 1./8.
-        valuation = [other_values] * 9
-        valuation[move.flat_position()] = 0
+        other_values = np.array(move.recommendations)
+        probability_residual = move.recommendations[move.flat_position] / 8.
+        other_values = other_values + probability_residual
+        valuation = other_values
+        valuation[move.flat_position] = 0
 
         self.brain.learn([board_position], [valuation])
 
@@ -37,9 +36,13 @@ class Player:
                 board_position = board_position * self.token
                 board_positions.append(copy.copy(board_position))
 
-                other_values = (1. - reward) / 8.
-                valuation = [other_values] * 9
-                valuation[move.flat_position()] = reward
+                if reward == 1:
+                    valuation = [0] * 9
+                else:
+                    probability_residual = move.recommendations[move.flat_position] / 8.
+                    valuation = np.array(move.recommendations)
+                    valuation = valuation + probability_residual
+                valuation[move.flat_position] = reward
                 valuations.append(valuation)
             board.update(move)
 
