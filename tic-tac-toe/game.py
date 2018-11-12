@@ -7,7 +7,7 @@ class Game:
         self.moves = []
         self.player1 = Player(player1_brain, 1)
         self.player2 = Player(player2_brain, -1)
-        self.winner = False
+        self.winner = None
         self.invalid_moves = 0
 
     def start(self):

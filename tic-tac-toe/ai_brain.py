@@ -35,7 +35,7 @@ class AIBrain:
     def learn(self, board_positions, valuations):
         print board_positions
         print valuations
-        # self.model.fit(np.array(board_positions), np.array(valuations), verbose=0)
+        self.model.fit(np.array(board_positions), np.array(valuations), verbose=0)
         pass
 
     def filename(self):
