@@ -1,5 +1,6 @@
 import random
 import csv
+import pdb
 
 class TicTacToe:
     def __init__(self, playerX, playerO):
@@ -7,6 +8,7 @@ class TicTacToe:
         self.playerX, self.playerO = playerX, playerO
         self.playerX_turn = True
         self.invalid_moves = 0
+        self.winner = None
 
     def play_game(self):
         self.playerX.start_game('X')
@@ -20,32 +22,32 @@ class TicTacToe:
             self.display_board()
 
             space = player.move(self.board)
-            # print "Player {char} picks {space}!".format(char=char, space=space)
+            print "Player {char} picks {space}!".format(char=char, space=space)
 
             if self.board[space-1] != ' ': # illegal move
-                # print "Invalid move! Try again!"
+                print "Invalid move! Try again!"
                 self.invalid_moves += 1
                 player.reward(-99, self.board) # score of shame
-                break
-            self.board[space-1] = char
-            if self.player_wins(char):
-                self.display_board()
-                player.reward(1, self.board)
-                other_player.reward(-1, self.board)
-                self.winner = char
-                # print "Player {char} wins!".format(char=char)
-                break
-            if self.board_full(): # tie game
-                self.display_board()
-                player.reward(0.5, self.board)
-                other_player.reward(0.5, self.board)
-                self.winner = None
-                # print "Tie!"
-                break
-            other_player.reward(0, self.board)
-            self.playerX_turn = not self.playerX_turn
+                if self.invalid_moves > 20: break
+            else:
+                self.board[space-1] = char
+                if self.player_wins(char):
+                    self.display_board()
+                    player.reward(1, self.board)
+                    other_player.reward(-1, self.board)
+                    self.winner = char
+                    print "Player {char} wins!".format(char=char)
+                    break
+                if self.board_full(): # tie game
+                    self.display_board()
+                    player.reward(0.5, self.board)
+                    other_player.reward(0.5, self.board)
+                    print "Tie!"
+                    break
+                other_player.reward(0, self.board)
+                self.playerX_turn = not self.playerX_turn
 
-        # print "\n\n\n"
+        print "\n\n\n"
 
     def player_wins(self, char):
         for a,b,c in [(0,1,2), (3,4,5), (6,7,8),
@@ -61,8 +63,8 @@ class TicTacToe:
     def display_board(self):
         row = " {} | {} | {}"
         hr = "\n-----------\n"
-        # print (row + hr + row + hr + row).format(*self.board)
-        # print "=============="
+        print (row + hr + row + hr + row).format(*self.board)
+        print "=============="
 
 
 class Player(object):
@@ -70,21 +72,21 @@ class Player(object):
         self.breed = "human"
 
     def start_game(self, char):
-        # print "\nNew game!"
+        print "\nNew game!"
         pass
 
     def move(self, board):
         return int(raw_input("Your move? "))
 
     def reward(self, value, board):
-        # print "{} rewarded: {}".format(self.breed, value)
+        print "{} rewarded: {}".format(self.breed, value)
         pass
 
     def available_moves(self, board):
         return [i+1 for i in range(0,9) if board[i] == ' ']
 
 class QLearningPlayer(Player):
-    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9):
+    def __init__(self, epsilon=0., alpha=0.3, gamma=0.9):
         self.breed = "Qlearner"
 
         self.epsilon = epsilon # e-greedy chance of random exploration
@@ -97,12 +99,13 @@ class QLearningPlayer(Player):
         try:
             with open('q-data.csv', mode='r') as infile:
                 reader = csv.reader(infile)
-                self.q = {((rows[0], rows[1], rows[2], rows[3], rows[4], rows[5], rows[6], rows[7], rows[8]), rows[9]): rows[10] for rows in reader}
+                for slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9, action, value in reader:
+                    self.q[((slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9), int(action))] = float(value)
         except IOError:
             pass
 
     def save(self):
-        with open('q-data.csv', mode='w') as outfile:
+        with open('q-data.csv', mode='wb') as outfile:
             writer = csv.writer(outfile)
             for key in self.q:
                 ((slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9), action) = key
@@ -123,12 +126,12 @@ class QLearningPlayer(Player):
         actions = self.available_moves(board)
 
         if random.random() < self.epsilon: # explore!
-            # print "random choice!"
+            print "random choice!"
             self.last_move = random.choice(actions)
             return self.last_move
 
         qs = [self.getQ(self.last_board, a) for a in actions]
-        # print zip(actions, qs)
+        print zip(actions, qs)
         maxQ = max(qs)
 
         if qs.count(maxQ) > 1:
@@ -154,28 +157,35 @@ class StaticPlayer(QLearningPlayer):
     def learn(self, state, action, reward, result_state):
         pass
 
+    def save(self):
+        pass
+
 p1 = QLearningPlayer()
 p2 = StaticPlayer()
 
-N_EPOCHS = 2
-N_ROUNDS = 10
+N_EPOCHS = 30
+N_ROUNDS = 100
 
 with open("q-outcomes.csv", 'ab') as csvfile:
     csv_writer = csv.writer(csvfile)
     for j in xrange(N_EPOCHS):
 
-        print "BEFORE LOAD"
-        print p1.q
-        print "\n" * 20
-        print p2.q
-        print p1.q == p2.q
+        # print "BEFORE LOAD"
+        # print p1.q
+        # print "\n" * 20
+        # print p2.q
+        # print p1.q == p2.q
+        # print len(p1.q)
+        # print len(p2.q)
         p1.save()
         p2.load()
-        print "AFTER LOAD"
-        print p1.q
-        print "\n" * 20
-        print p2.q
-        print p1.q == p2.q
+        # print "AFTER LOAD"
+        # print p1.q
+        # print "\n" * 20
+        # print p2.q
+        # print p1.q == p2.q
+        # print len(p1.q)
+        # print len(p2.q)
 
         for i in xrange(N_ROUNDS):
             print "Epoch {j}, Game {i}".format(j=j, i=i)
@@ -191,4 +201,3 @@ with open("q-outcomes.csv", 'ab') as csvfile:
                     csv_writer.writerow([int(t.winner == 'O'), t.invalid_moves])
             else:
                 csv_writer.writerow([0.5, t.invalid_moves])
-
